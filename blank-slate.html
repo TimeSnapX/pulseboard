@@ -1,0 +1,89 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reset PulseBoard · blank slate</title>
+  <style>
+    body { font-family: system-ui, sans-serif; background:#0b0f14; color:#e8eef6; min-height:100vh; display:grid; place-items:center; margin:0; padding:24px; }
+    .card { max-width:440px; background:#151b24; border:1px solid #2a3444; border-radius:16px; padding:24px; }
+    h1 { font-size:1.25rem; margin:0 0 8px; }
+    p { color:#8b9bb4; line-height:1.45; }
+    button { display:block; width:100%; margin-top:14px; padding:14px 16px; border-radius:12px; border:0; font-weight:700; cursor:pointer; font-size:1rem; }
+    #go { background:#e06c75; color:#fff; }
+    #cancel { background:#2a3444; color:#e8eef6; text-decoration:none; text-align:center; }
+    .ok { color:#5dcaa5; margin-top:14px; display:none; }
+    .err { color:#e06c75; margin-top:14px; display:none; }
+    ul { color:#e8eef6; padding-left:1.1rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Blank slate PulseBoard</h1>
+    <p>Wipes <b>all</b> local PulseBoard data in this browser:</p>
+    <ul>
+      <li>Habits + heatmaps</li>
+      <li>Goals</li>
+      <li>Money / expenses</li>
+      <li>Trading log</li>
+      <li>Intake (cigs / drinks)</li>
+      <li>Karate sessions</li>
+    </ul>
+    <p>This cannot be undone unless you have an export.</p>
+    <button type="button" id="go">Wipe everything</button>
+    <a class="btn" id="cancel" href="./" style="display:block;margin-top:14px;padding:14px 16px;border-radius:12px;background:#2a3444;color:#e8eef6;font-weight:700;text-align:center;text-decoration:none;">Cancel</a>
+    <p class="ok" id="ok">Wiped. Opening a clean PulseBoard…</p>
+    <p class="err" id="err"></p>
+  </div>
+  <script>
+    const KEY = "pulseboard-v1";
+    function todayISO() {
+      const d = new Date();
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return y + "-" + m + "-" + day;
+    }
+    document.getElementById("go").addEventListener("click", () => {
+      if (!confirm("Wipe the entire PulseBoard in this browser?")) return;
+      try {
+        const blank = {
+          version: 1,
+          habits: [],
+          habitLogs: {},
+          goals: [],
+          expenses: [],
+          incomes: [],
+          deposits: [],
+          openingSavings: { date: todayISO(), amount: 0 },
+          budgets: {
+            Food: 0, Fuel: 0, Rent: 0, Training: 0,
+            "Trading costs": 0, Cigarettes: 0, Alcohol: 0, Other: 0
+          },
+          weeklySaveRate: 50,
+          trading: {
+            startingCapital: 1000,
+            status: "preparing",
+            readiness: { account: false, id: false, demo: false, rules: false, maxLoss: false, journal: false },
+            risk: { maxRiskPct: 1, maxDailyLoss: 50, maxOpen: 2 },
+            trades: [],
+            weeklyReview: { worked: "", fix: "" }
+          },
+          intake: {
+            cigCap: 140, packCost: 40, cigsPerPack: 20,
+            drinkCap: 10, drinkCost: 8,
+            cigs: {}, cigNotes: {}, drinks: []
+          },
+          karate: { usualDays: [1, 3, 5], targetPerWeek: 3, sessions: [] }
+        };
+        localStorage.setItem(KEY, JSON.stringify(blank));
+        document.getElementById("ok").style.display = "block";
+        setTimeout(() => { location.href = "./#habits"; }, 600);
+      } catch (e) {
+        document.getElementById("err").style.display = "block";
+        document.getElementById("err").textContent = String(e.message || e);
+      }
+    });
+  </script>
+</body>
+</html>
