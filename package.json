@@ -1,0 +1,10 @@
+{
+  "name": "pulseboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Dark personal dashboard for habits, goals, money, IG trading prep, intake, and karate.",
+  "scripts": {
+    "start": "python -m http.server 4176 --bind 127.0.0.1"
+  }
+}
